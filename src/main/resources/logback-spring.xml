@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="false" scanPeriod="5 minutes" debug="false">
+    <property name="basePath" value="logs"/>
+    <property name="appLogPath" value="${basePath}/app"/>
+    <property name="druidLogPath" value="${basePath}/druid"/>
+    <property name="errorLogPath" value="${basePath}/error"/>
+
+    <appender name="consoleAppender" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] [%logger] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="appLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${appLogPath}/app.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${appLogPath}/app.log-%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <maxFileSize>5MB</maxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] [%logger] - %msg%n</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="druidLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${druidLogPath}/druid.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${druidLogPath}/app.log-%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <maxFileSize>5MB</maxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] [%logger] - %msg%n</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+    </appender>
+
+    <appender name="errorLogAppender" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${errorLogPath}/error.log</file>
+        <filter class="ch.qos.logback.classic.filter.LevelFilter">
+            <level>ERROR</level>
+            <onMatch>ACCEPT</onMatch>
+            <onMismatch>DENY</onMismatch>
+        </filter>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <fileNamePattern>${errorLogPath}/error.log-%d{yyyy-MM-dd}.%i</fileNamePattern>
+            <maxFileSize>5MB</maxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>%date{yyyy-MM-dd HH:mm:ss.SSS} %-5level [%thread] [%logger] - %msg%n</pattern>
+            <charset>utf-8</charset>
+        </encoder>
+    </appender>
+
+    <springProfile name="dev">
+        <logger name="com.universe.wonderful" level="DEBUG">
+            <appender-ref ref="appLogAppender"/>
+            <appender-ref ref="errorLogAppender"/>
+        </logger>
+        <logger name="com.alibaba.druid">
+            <appender-ref ref="druidLogAppender"/>
+            <appender-ref ref="errorLogAppender"/>
+        </logger>
+    </springProfile>
+
+    <springProfile name="prod">
+        <logger name="com.universe.wonderful" level="INFO" additivity="false">
+            <appender-ref ref="appLogAppender"/>
+            <appender-ref ref="errorLogAppender"/>
+        </logger>
+        <logger name="com.alibaba.druid" level="INFO" additivity="false">
+            <appender-ref ref="druidLogAppender"/>
+            <appender-ref ref="errorLogAppender"/>
+        </logger>
+    </springProfile>
+
+    <root level="INFO">
+        <appender-ref ref="consoleAppender"/>
+    </root>
+
+</configuration>
