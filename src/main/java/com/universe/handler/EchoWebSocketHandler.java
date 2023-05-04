@@ -13,13 +13,12 @@ import java.nio.charset.StandardCharsets;
  * @date 2023/5/1
  */
 @Slf4j
-public class EchoWebsocketHandler extends TextWebSocketHandler {
+public class EchoWebSocketHandler extends TextWebSocketHandler {
 
 	@Override
 	protected void handleTextMessage(WebSocketSession session, TextMessage message) throws Exception {
 		String content = new String(message.asBytes(), StandardCharsets.UTF_8);
-
-		log.info("Websocket message received: {}", content);
+		log.info("WebSocket message received: {}", content);
 		session.sendMessage(message);
 	}
 
