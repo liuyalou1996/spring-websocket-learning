@@ -33,15 +33,15 @@
         $("#msgReceived").val('');
     });
 
-    let ws = null;
     let stompClient = null;
 
+    // 连接服务器
     const connect = () => {
-        ws = new SockJS('http://localhost:8080/websocket');
+        const ws = new SockJS('http://localhost:8080/websocket');
         stompClient = Stomp.over(ws);
         stompClient.connect({}, () => {
             $("#msgReceived").val('Connected to websocket server!');
-            stompClient.subscribe('/app/greeting', function (message) {
+            stompClient.subscribe('/topic/greeting', function (message) {
                     console.log(`Received message: ${message.body}`);
                     $("#msgReceived").val(message.body);
                 }
@@ -49,14 +49,16 @@
         });
     }
 
+    // 断连
     const disconnect = () => {
         stompClient.disconnect(() => {
             $("#msgReceived").val('Disconnected from WebSocket server');
         });
     }
 
+    // 发送消息，这里直接发的是文本
     const sendMessage = () => {
-        stompClient.send('/topic/greeting', {}, $('#msgSent').val());
+        stompClient.send('/app/greeting', {}, $('#msgSent').val());
     }
 </script>
 </body>

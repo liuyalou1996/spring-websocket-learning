@@ -2,7 +2,6 @@ package com.universe.config;
 
 import com.universe.handler.EchoWebSocketHandler;
 import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.WebSocketConfigurer;
 import org.springframework.web.socket.config.annotation.WebSocketHandlerRegistry;
@@ -13,7 +12,7 @@ import org.springframework.web.socket.server.support.HttpSessionHandshakeInterce
  * @author Nick Liu
  * @date 2023/4/27
  */
-@Configuration
+// @Configuration
 @EnableWebSocket
 public class WebsocketConfig implements WebSocketConfigurer {
 

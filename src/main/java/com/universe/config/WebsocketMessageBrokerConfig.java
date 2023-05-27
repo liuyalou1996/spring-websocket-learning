@@ -18,22 +18,22 @@ public class WebsocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
-		registry.addEndpoint("/websocket")
+		registry.addEndpoint("/websocket") // WebSocket握手端口
 			.addInterceptors(new HttpSessionHandshakeInterceptor())
-			.setAllowedOriginPatterns("*")
-			.withSockJS();
+			.setAllowedOriginPatterns("*") // 设置跨域
+			.withSockJS(); // 开启SockJS回退机制
 	}
 
 	@Override
 	public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
+		// 这里我们设置入站消息最大为8K
 		registry.setMessageSizeLimit(8 * 1024);
 	}
 
 	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
-		registry.setApplicationDestinationPrefixes("/app")
-			.enableSimpleBroker("/topic");
+		registry.setApplicationDestinationPrefixes("/app") // 发送到服务端目的地前缀
+			.enableSimpleBroker("/topic");// 开启简单消息代理，指定消息订阅前缀
 	}
-
 
 }
