@@ -1,6 +1,8 @@
 package com.universe.config;
 
+import com.universe.interceptor.FetchHeaderChannelInterceptor;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
@@ -22,6 +24,11 @@ public class WebsocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 			.addInterceptors(new HttpSessionHandshakeInterceptor())
 			.setAllowedOriginPatterns("*") // 设置跨域
 			.withSockJS(); // 开启SockJS回退机制
+	}
+
+	@Override
+	public void configureClientInboundChannel(ChannelRegistration registration) {
+		registration.interceptors(new FetchHeaderChannelInterceptor());
 	}
 
 	@Override

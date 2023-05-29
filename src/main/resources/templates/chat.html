@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <title>greeting</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
+    <style>
+        #mainWrapper {
+            width: 600px;
+            margin: auto;
+        }
+    </style>
+</head>
+<body>
+<div id="mainWrapper">
+    <div>
+        <label for="username" style="margin-right: 5px">姓名：</label><input id="username" type="text"/>
+    </div>
+    <div id="msgWrapper">
+        <p style="vertical-align: top">发送的消息:</p>
+        <textarea id="msgSent" style="width: 400px;height: 100px"></textarea>
+        <p style="vertical-align: top">收到的群聊消息:</p>
+        <textarea id="groupMsgReceived" style="width: 400px;height: 100px"></textarea>
+        <p style="vertical-align: top">收到的私聊消息:</p>
+        <textarea id="privateMsgReceived" style="width: 400px;height: 100px"></textarea>
+    </div>
+    <div style="margin-top: 5px;">
+        <button onclick="connect()">连接</button>
+        <button onclick="sendGroupMessage()">发送群聊消息</button>
+        <button onclick="sendPrivateMessage()">发送私聊消息</button>
+        <button onclick="disconnect()">断开连接</button>
+    </div>
+</div>
+<script type="text/javascript">
+    $(() => {
+        $('#msgSent').val('');
+        $("#groupMsgReceived").val('');
+        $("#privateMsgReceived").val('');
+    });
+
+    let stompClient = null;
+
+
+    // 连接服务器
+    const userId = new Date().getTime().toString();
+    const header = {"User-ID": userId};
+    const connect = () => {
+        const ws = new SockJS('http://localhost:8080/websocket');
+        stompClient = Stomp.over(ws);
+        stompClient.connect(header, () => {
+            subscribeTopic();
+        });
+    }
+
+    // 订阅主题
+    const subscribeTopic = () => {
+        stompClient.subscribe('/topic/chat/group', function (message) {
+                console.log(`Group message received : ${message.body}`);
+                const resp = JSON.parse(message.body);
+                $("#groupMsgReceived").val(resp.content);
+            }
+        );
+        stompClient.subscribe('/user/topic/chat/private', message => {
+                console.log(`Private message received : ${message.body}`);
+                const resp = JSON.parse(message.body);
+                $("#privateMsgReceived").val(resp.content);
+            }
+        );
+        // 订阅定时推送的消息
+        stompClient.subscribe(`/topic/user/${userId}/chat/push`, message => {
+                console.log(`Private message received : ${message.body}`);
+                const resp = JSON.parse(message.body);
+                $("#privateMsgReceived").val(resp.content);
+            }
+        );
+    };
+
+    // 断连
+    const disconnect = () => {
+        stompClient.disconnect(() => {
+            $("#msgReceived").val('Disconnected from WebSocket server');
+        });
+    }
+
+    // 发送群聊消息
+    const sendGroupMessage = () => {
+        const msg = {name: $('#username').val(), content: $('#msgSent').val()};
+        stompClient.send('/app/chat/group', {}, JSON.stringify(msg));
+    }
+
+    // 发送私聊消息
+    const sendPrivateMessage = () => {
+        const msg = {name: $('#username').val(), content: $('#msgSent').val()};
+        stompClient.send('/app/chat/private', {}, JSON.stringify(msg));
+    }
+</script>
+</body>
+</html>

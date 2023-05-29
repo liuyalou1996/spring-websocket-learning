@@ -1,4 +1,4 @@
-package com.universe.dto;
+package com.universe.pojo.dto;
 
 import lombok.Data;
 
@@ -7,7 +7,9 @@ import lombok.Data;
  * @date 2023/5/1
  */
 @Data
-public class WebsocketMsgDTO {
+public class WebSocketMsgDTO {
 
 	private String name;
+
+	private String content;
 }
