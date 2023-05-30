@@ -28,6 +28,7 @@ public class WebsocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
 	@Override
 	public void configureClientInboundChannel(ChannelRegistration registration) {
+		// 拦截器配置
 		registration.interceptors(new UserAuthenticationChannelInterceptor());
 	}
 

@@ -16,7 +16,7 @@ public class GreetingController {
 
 	@GetMapping("/page/greeting")
 	public ModelAndView turnToGreetingPage() {
-		return new ModelAndView("/greeting");
+		return new ModelAndView("greeting");
 	}
 
 	@MessageMapping("/greeting")

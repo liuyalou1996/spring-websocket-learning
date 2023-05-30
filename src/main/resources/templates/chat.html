@@ -54,6 +54,8 @@
     // 订阅主题
     const subscribeTopic = () => {
         alert("连接成功!");
+
+        // 订阅广播消息
         stompClient.subscribe('/topic/chat/group', function (message) {
                 console.log(`Group message received : ${message.body}`);
                 const resp = JSON.parse(message.body);
@@ -61,6 +63,7 @@
                 $("#groupMsgReceived").val(`${previousMsg}${resp.content}\n`);
             }
         );
+        // 订阅单播消息
         stompClient.subscribe('/user/topic/chat/private', message => {
                 console.log(`Private message received : ${message.body}`);
                 const resp = JSON.parse(message.body);
@@ -68,7 +71,7 @@
                 $("#privateMsgReceived").val(`${previousMsg}${resp.content}\n`);
             }
         );
-        // 订阅定时推送的消息
+        // 订阅定时推送的单播消息
         stompClient.subscribe(`/user/topic/chat/push`, message => {
                 console.log(`Private message received : ${message.body}`);
                 const resp = JSON.parse(message.body);

@@ -15,10 +15,20 @@ import java.security.Principal;
 @NoArgsConstructor
 public class StompAuthenticatedUser implements Principal {
 
+	/**
+	 * 用户唯一ID
+	 */
 	private String userId;
 
+	/**
+	 * 用户昵称
+	 */
 	private String nickName;
 
+	/**
+	 * 用于指定用户消息推送的标识
+	 * @return
+	 */
 	@Override
 	public String getName() {
 		return this.userId;
