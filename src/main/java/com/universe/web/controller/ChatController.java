@@ -1,6 +1,6 @@
 package com.universe.web.controller;
 
-import com.universe.holder.UserSessionHolder;
+import com.universe.pojo.StompAuthenticatedUser;
 import com.universe.pojo.dto.WebSocketMsgDTO;
 import com.universe.pojo.vo.WebSocketMsgVO;
 import com.universe.util.FastJsonUtils;
@@ -8,10 +8,9 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.SendTo;
-import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
-import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.annotation.SendToUser;
+import org.springframework.messaging.simp.user.SimpUserRegistry;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -19,6 +18,7 @@ import org.springframework.web.servlet.ModelAndView;
 
 import java.time.LocalDateTime;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /**
  * @author Nick Liu
@@ -29,6 +29,7 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class ChatController {
 
+	private final SimpUserRegistry simpUserRegistry;
 	private final SimpMessagingTemplate simpMessagingTemplate;
 
 	@GetMapping("/page/chat")
@@ -54,15 +55,24 @@ public class ChatController {
 
 	@Scheduled(fixedRate = 10 * 1000)
 	public void pushMessageAtFixedRate() {
-		WebSocketMsgVO webSocketMsgVO = WebSocketMsgVO.builder()
-			.content(String.format("定时推送的消息, 时间:%s", LocalDateTime.now()))
-			.build();
-		Set<String> userIdSet = UserSessionHolder.getAllUserID();
-		userIdSet.forEach(userId -> {
-			SimpMessageHeaderAccessor header = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
-			header.setSessionId(null);
+		log.info("当前在线人数: {}", simpUserRegistry.getUserCount());
+		if (simpUserRegistry.getUserCount() <= 0) {
+			return;
+		}
+
+		// 这里的Principal为StompAuthenticatedUser实例
+		Set<StompAuthenticatedUser> users = simpUserRegistry.getUsers().stream()
+			.map(simpUser -> StompAuthenticatedUser.class.cast(simpUser.getPrincipal()))
+			.collect(Collectors.toSet());
+
+		users.forEach(authenticatedUser -> {
+			String userId = authenticatedUser.getUserId();
+			String nickName = authenticatedUser.getNickName();
+			WebSocketMsgVO webSocketMsgVO = new WebSocketMsgVO();
+			webSocketMsgVO.setContent(String.format("定时推送的私聊消息, 接收人: %s, 时间: %s", nickName, LocalDateTime.now()));
+
 			log.info("开始推送消息给指定用户, userId: {}, 消息内容:{}", userId, FastJsonUtils.toJsonString(webSocketMsgVO));
-			simpMessagingTemplate.convertAndSendToUser(userId, "/chat/push", webSocketMsgVO, header.getMessageHeaders());
+			simpMessagingTemplate.convertAndSendToUser(userId, "/topic/chat/push", webSocketMsgVO);
 		});
 	}
 

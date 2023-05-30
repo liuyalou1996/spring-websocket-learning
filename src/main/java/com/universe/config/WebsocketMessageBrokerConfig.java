@@ -1,6 +1,6 @@
 package com.universe.config;
 
-import com.universe.interceptor.FetchHeaderChannelInterceptor;
+import com.universe.interceptor.UserAuthenticationChannelInterceptor;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.ChannelRegistration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
@@ -28,7 +28,7 @@ public class WebsocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 
 	@Override
 	public void configureClientInboundChannel(ChannelRegistration registration) {
-		registration.interceptors(new FetchHeaderChannelInterceptor());
+		registration.interceptors(new UserAuthenticationChannelInterceptor());
 	}
 
 	@Override

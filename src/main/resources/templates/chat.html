@@ -20,11 +20,11 @@
     </div>
     <div id="msgWrapper">
         <p style="vertical-align: top">发送的消息:</p>
-        <textarea id="msgSent" style="width: 400px;height: 100px"></textarea>
+        <textarea id="msgSent" style="width: 600px;height: 100px"></textarea>
         <p style="vertical-align: top">收到的群聊消息:</p>
-        <textarea id="groupMsgReceived" style="width: 400px;height: 100px"></textarea>
+        <textarea id="groupMsgReceived" style="width: 600px;height: 100px"></textarea>
         <p style="vertical-align: top">收到的私聊消息:</p>
-        <textarea id="privateMsgReceived" style="width: 400px;height: 100px"></textarea>
+        <textarea id="privateMsgReceived" style="width: 600px;height: 200px"></textarea>
     </div>
     <div style="margin-top: 5px;">
         <button onclick="connect()">连接</button>
@@ -44,35 +44,36 @@
 
 
     // 连接服务器
-    const userId = new Date().getTime().toString();
-    const header = {"User-ID": userId};
     const connect = () => {
+        const header = {"User-ID": new Date().getTime().toString(), "User-Name": $('#username').val()};
         const ws = new SockJS('http://localhost:8080/websocket');
         stompClient = Stomp.over(ws);
-        stompClient.connect(header, () => {
-            subscribeTopic();
-        });
+        stompClient.connect(header, () => subscribeTopic());
     }
 
     // 订阅主题
     const subscribeTopic = () => {
+        alert("连接成功!");
         stompClient.subscribe('/topic/chat/group', function (message) {
                 console.log(`Group message received : ${message.body}`);
                 const resp = JSON.parse(message.body);
-                $("#groupMsgReceived").val(resp.content);
+                const previousMsg = $("#groupMsgReceived").val();
+                $("#groupMsgReceived").val(`${previousMsg}${resp.content}\n`);
             }
         );
         stompClient.subscribe('/user/topic/chat/private', message => {
                 console.log(`Private message received : ${message.body}`);
                 const resp = JSON.parse(message.body);
-                $("#privateMsgReceived").val(resp.content);
+                const previousMsg = $("#privateMsgReceived").val();
+                $("#privateMsgReceived").val(`${previousMsg}${resp.content}\n`);
             }
         );
         // 订阅定时推送的消息
-        stompClient.subscribe(`/topic/user/${userId}/chat/push`, message => {
+        stompClient.subscribe(`/user/topic/chat/push`, message => {
                 console.log(`Private message received : ${message.body}`);
                 const resp = JSON.parse(message.body);
-                $("#privateMsgReceived").val(resp.content);
+                const previousMsg = $("#privateMsgReceived").val();
+                $("#privateMsgReceived").val(`${previousMsg}${resp.content}\n`);
             }
         );
     };

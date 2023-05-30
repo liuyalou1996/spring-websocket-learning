@@ -1,7 +1,8 @@
 package com.universe.holder;
 
-import java.util.LinkedHashSet;
-import java.util.Set;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.function.BiConsumer;
 
 /**
  * @author Nick Liu
@@ -9,13 +10,14 @@ import java.util.Set;
  */
 public class UserSessionHolder {
 
-	private static final Set<String> USER_ID_SET = new LinkedHashSet<>();
+	private static final Map<String, String> USER_SESSION_MAP = new LinkedHashMap<>();
 
-	public static void addUserID(String userId) {
-		USER_ID_SET.add(userId);
+	public static void addSession(String userId, String sessionId) {
+		USER_SESSION_MAP.put(userId, sessionId);
 	}
 
-	public static Set<String> getAllUserID() {
-		return USER_ID_SET;
+	public static void listAllSessionID(BiConsumer<String, String> consumer) {
+		USER_SESSION_MAP.forEach(consumer);
 	}
+
 }
