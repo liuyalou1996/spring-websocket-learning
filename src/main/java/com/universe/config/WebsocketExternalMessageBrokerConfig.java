@@ -36,12 +36,12 @@ public class WebsocketExternalMessageBrokerConfig implements WebSocketMessageBro
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
 		registry.setApplicationDestinationPrefixes("/app") // 发送到服务端目的地前缀
 			.enableStompBrokerRelay("/topic") // 开启外部消息代理，指定消息订阅前缀
-			.setRelayHost("175.178.107.127") // 外部消息代理
-			.setRelayPort(61613)
-			.setSystemLogin("admin")
-			.setSystemPasscode("admin")
-			.setClientLogin("admin")
-			.setClientPasscode("admin")
-			.setVirtualHost("/stomp");
+			.setRelayHost("175.178.107.127") // 外部消息代理Host
+			.setRelayPort(61613) // 外部消息代理STOMP端口
+			.setSystemLogin("admin")  // 共享系统连接用户名
+			.setSystemPasscode("admin") // 共享系统连接密码
+			.setClientLogin("admin") // 客户端连接用户名
+			.setClientPasscode("admin") // 客户端连接密码
+			.setVirtualHost("/stomp"); // RabbitMQ虚拟主机
 	}
 }
