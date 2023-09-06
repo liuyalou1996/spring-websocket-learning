@@ -7,16 +7,22 @@ import org.springframework.messaging.simp.config.MessageBrokerRegistry;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
-import org.springframework.web.socket.config.annotation.WebSocketTransportRegistration;
 import org.springframework.web.socket.server.support.HttpSessionHandshakeInterceptor;
 
 /**
+ * Websocket连接外部消息代理配置
  * @author Nick Liu
- * @date 2023/5/1
+ * @date 2023/9/6
  */
 @Configuration
 @EnableWebSocketMessageBroker
-public class WebsocketMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
+public class WebsocketExternalMessageBrokerConfig implements WebSocketMessageBrokerConfigurer {
+
+	@Override
+	public void configureClientInboundChannel(ChannelRegistration registration) {
+		// 拦截器配置
+		registration.interceptors(new UserAuthenticationChannelInterceptor());
+	}
 
 	@Override
 	public void registerStompEndpoints(StompEndpointRegistry registry) {
@@ -27,21 +33,15 @@ public class WebsocketMessageBrokerConfig implements WebSocketMessageBrokerConfi
 	}
 
 	@Override
-	public void configureClientInboundChannel(ChannelRegistration registration) {
-		// 拦截器配置
-		registration.interceptors(new UserAuthenticationChannelInterceptor());
-	}
-
-	@Override
-	public void configureWebSocketTransport(WebSocketTransportRegistration registry) {
-		// 这里我们设置入站消息最大为8K
-		registry.setMessageSizeLimit(8 * 1024);
-	}
-
-	@Override
 	public void configureMessageBroker(MessageBrokerRegistry registry) {
 		registry.setApplicationDestinationPrefixes("/app") // 发送到服务端目的地前缀
-			.enableSimpleBroker("/topic");// 开启简单消息代理，指定消息订阅前缀
+			.enableStompBrokerRelay("/topic") // 开启外部消息代理，指定消息订阅前缀
+			.setRelayHost("175.178.107.127") // 外部消息代理
+			.setRelayPort(61613)
+			.setSystemLogin("admin")
+			.setSystemPasscode("admin")
+			.setClientLogin("admin")
+			.setClientPasscode("admin")
+			.setVirtualHost("/stomp");
 	}
-
 }

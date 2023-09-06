@@ -2,7 +2,7 @@
 <html lang="en" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8">
-    <title>greeting</title>
+    <title>chat</title>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/sockjs-client/1.6.1/sockjs.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/stomp.js/2.3.3/stomp.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.4/jquery.min.js"></script>
@@ -56,7 +56,7 @@
         alert("连接成功!");
 
         // 订阅广播消息
-        stompClient.subscribe('/topic/chat/group', function (message) {
+        stompClient.subscribe('/topic/chat-group', function (message) {
                 console.log(`Group message received : ${message.body}`);
                 const resp = JSON.parse(message.body);
                 const previousMsg = $("#groupMsgReceived").val();
@@ -64,7 +64,7 @@
             }
         );
         // 订阅单播消息
-        stompClient.subscribe('/user/topic/chat/private', message => {
+        stompClient.subscribe('/user/topic/chat-private', message => {
                 console.log(`Private message received : ${message.body}`);
                 const resp = JSON.parse(message.body);
                 const previousMsg = $("#privateMsgReceived").val();
@@ -72,7 +72,7 @@
             }
         );
         // 订阅定时推送的单播消息
-        stompClient.subscribe(`/user/topic/chat/push`, message => {
+        stompClient.subscribe(`/user/topic/chat-push`, message => {
                 console.log(`Private message received : ${message.body}`);
                 const resp = JSON.parse(message.body);
                 const previousMsg = $("#privateMsgReceived").val();

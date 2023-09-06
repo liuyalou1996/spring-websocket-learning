@@ -48,7 +48,7 @@ public class ChatController {
 	 * @return 消息内容，方法返回值将会广播给所有订阅"/topic/chat/group"的客户端
 	 */
 	@MessageMapping("/chat/group")
-	@SendTo("/topic/chat/group")
+	@SendTo("/topic/chat-group")
 	public WebSocketMsgVO groupChat(WebSocketMsgDTO webSocketMsgDTO) {
 		log.info("Group chat message received: {}", FastJsonUtils.toJsonString(webSocketMsgDTO));
 		String content = String.format("来自[%s]的群聊消息: %s", webSocketMsgDTO.getName(), webSocketMsgDTO.getContent());
@@ -63,7 +63,7 @@ public class ChatController {
 	 * @return 消息内容，方法返回值将会基于SessionID单播给指定用户
 	 */
 	@MessageMapping("/chat/private")
-	@SendToUser("/topic/chat/private")
+	@SendToUser("/topic/chat-private")
 	public WebSocketMsgVO privateChat(WebSocketMsgDTO webSocketMsgDTO) {
 		log.info("Private chat message received: {}", FastJsonUtils.toJsonString(webSocketMsgDTO));
 		String content = "私聊消息回复：" + webSocketMsgDTO.getContent();
@@ -93,7 +93,7 @@ public class ChatController {
 			webSocketMsgVO.setContent(String.format("定时推送的私聊消息, 接收人: %s, 时间: %s", nickName, LocalDateTime.now()));
 
 			log.info("开始推送消息给指定用户, userId: {}, 消息内容:{}", userId, FastJsonUtils.toJsonString(webSocketMsgVO));
-			simpMessagingTemplate.convertAndSendToUser(userId, "/topic/chat/push", webSocketMsgVO);
+			simpMessagingTemplate.convertAndSendToUser(userId, "/topic/chat-push", webSocketMsgVO);
 		});
 	}
 
