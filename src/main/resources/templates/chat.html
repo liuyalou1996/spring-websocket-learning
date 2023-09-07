@@ -84,7 +84,7 @@
     // 断连
     const disconnect = () => {
         stompClient.disconnect(() => {
-            $("#msgReceived").val('Disconnected from WebSocket server');
+            alert("断开连接!");
         });
     }
 
